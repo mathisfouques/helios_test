@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helios_test/bloc/user_repository.dart';
+import 'package:http/http.dart';
+
 import 'package:helios_test/bloc/user_bloc.dart';
 import 'package:helios_test/bloc/user_event.dart';
 import 'package:helios_test/utils.dart';
 import 'package:helios_test/view/users_list.dart';
 import 'package:helios_test/widgets/page_indicator.dart';
-import 'package:http/http.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,7 +24,12 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: BlocProvider<UsersBloc>(
-        create: (_) => UsersBloc(httpClient: Client())..add(UsersFetched()),
+        create: (_) {
+          final Client httpClient = Client();
+          final repository = UsersAPIRepository(httpClient);
+
+          return UsersBloc(repository)..add(UsersFetched());
+        },
         child: Stack(
           children: const [
             Positioned(
